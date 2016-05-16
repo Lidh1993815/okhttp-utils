@@ -1,11 +1,33 @@
 package com.zhy.http.okhttp.callback;
 
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
+
 import okhttp3.Call;
 import okhttp3.Request;
 import okhttp3.Response;
 
 public abstract class Callback<T>
 {
+    protected Type type;
+
+    public Callback() {
+        Class clazz = getClass();
+        Type t = clazz.getGenericSuperclass();
+        if (t instanceof ParameterizedType) {
+            Type[] args = ((ParameterizedType) t).getActualTypeArguments();
+            this.type = args[0];
+        }
+    }
+
+    public Type getType() {
+        return type;
+    }
+
+    public void setType(Type type) {
+        this.type = type;
+    }
+
     /**
      * UI Thread
      *
@@ -42,8 +64,7 @@ public abstract class Callback<T>
 
     public abstract void onError(Call call, Exception e);
 
-    public abstract void onResponse(T response);
-
+    public abstract void onResponse(Call call, T response);
 
     public static Callback CALLBACK_DEFAULT = new Callback()
     {
@@ -51,7 +72,7 @@ public abstract class Callback<T>
         @Override
         public Object parseNetworkResponse(Response response) throws Exception
         {
-            return null;
+            return response.body().string();
         }
 
         @Override
@@ -61,7 +82,7 @@ public abstract class Callback<T>
         }
 
         @Override
-        public void onResponse(Object response)
+        public void onResponse(Call call, Object response)
         {
 
         }

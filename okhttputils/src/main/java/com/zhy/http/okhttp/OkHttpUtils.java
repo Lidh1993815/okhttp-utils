@@ -206,7 +206,7 @@ public class OkHttpUtils
                 try
                 {
                     Object o = finalCallback.parseNetworkResponse(response);
-                    sendSuccessResultCallback(o, finalCallback);
+                    sendSuccessResultCallback(call, o, finalCallback);
                 } catch (Exception e)
                 {
                     sendFailResultCallback(call, e, finalCallback);
@@ -248,7 +248,7 @@ public class OkHttpUtils
         });
     }
 
-    public void sendSuccessResultCallback(final Object object, final Callback callback)
+    public void sendSuccessResultCallback(final Call call, final Object object, final Callback callback)
     {
         if (callback == null) return;
         mDelivery.post(new Runnable()
@@ -256,7 +256,7 @@ public class OkHttpUtils
             @Override
             public void run()
             {
-                callback.onResponse(object);
+                callback.onResponse(call, object);
                 callback.onAfter();
             }
         });
